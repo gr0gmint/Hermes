@@ -61,6 +61,8 @@ def announce(context, request):
         peer.seeding = True
         DBSession.add(torrent)
         DBSession.commit()
+    else:
+        peer.seeding = False
     if 'event' in request.params:
         event = request.params['event']
         if event == 'started':
