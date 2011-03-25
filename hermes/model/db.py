@@ -3,11 +3,11 @@ from dripple.model import Base, DBSession
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, DateTime, PickleType, Boolean, Index
 from sqlalchemy.orm import relationship, backref
 import datetime
-
+import hashlib
 
 class Torrent(Base):
     __tablename__ = 'torrents'
-    id = Column(Integer, primary_key=True)
+    torrent_id = Column(Integer, primary_key=True)
     info_hash = Column(String)
     name = Column(String)
     desc = Column(String)
@@ -15,12 +15,16 @@ class Torrent(Base):
     torrent_file = Column(String)
     uploaded_time = Column(DateTime)
     download_count = Column(Integer, default=0)
-    seeders = Column(Integer)
-    leechers = Column(Integer)
-Index('infohash', Torrent.info_hash)
+    seeders = Column(Integer, default=0)
+    leechers = Column(Integer, default=0)
 
 
 
+class PrincipalMembers(Base):
+    __tablename__ = 'principalmembers'
+    principalmembership_id = Column(Integer, primary_key=True)
+    principal_id = Column(Integer, ForeignKey('principals.principal_id'))
+    user_id = Column(Integer, ForeignKey('users.user_id'))
 class Friendship(Base):
     __tablename__ = 'friendships'
     friendship_id = Column(Integer, primary_key=True)
@@ -49,19 +53,17 @@ class User(Base):
     awaiting_friendships = relationship(Friendship, primaryjoin = (Friendship.usertwo_id == user_id), backref='usertwo')
     principals = relationship(Principal, secondary=PrincipalMembers.__table__)
     passkey = Column(String)
-    uploaded = Column(Integer)
-    downloaded = Column(Integer)
-Index('indpasskey', User.passkey)
+    uploaded = Column(Integer, default=0)
+    downloaded = Column(Integer, default=0)
+
 
 
 class Peer(Base):
     __tablename__ = 'peers'
     id = Column(Integer, primary_key=True)
     peer_id = Column(String)
-    torrent_id = ForeignKey('torrents.id')
-    torrent = relation(Torrent, backref='peers')
-    user_id = ForeignKey('users.id')
-    user = relation(User, backref='activity')
+    torrent_id = Column(Integer, ForeignKey('torrents.torrent_id'))
+    user_id = Column(Integer, ForeignKey('users.user_id'))
     ip = Column(String)
     port = Column(Integer)
     active = Column(Boolean)
@@ -71,4 +73,10 @@ class Peer(Base):
     downloaded_total = Column(Integer, default=0)
     seeding = Column(Boolean, default=False)
     
-Index('torrentid', Peer.torrent_id)
+    
+    torrent = relationship(Torrent, backref='peers')
+
+    user = relationship(User, backref='activity')
+#Index('indpasskey', User.passkey)
+#Index('infohash', Torrent.info_hash)
+    

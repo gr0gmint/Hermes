@@ -16,7 +16,8 @@ Hermes.egg-info/top_level.txt
 hermes/__init__.py
 hermes/resources.py
 hermes/tests.py
-hermes/views.py
+hermes/model/__init__.py
+hermes/model/db.py
 hermes/static/favicon.ico
 hermes/static/footerbg.png
 hermes/static/headerbg.png
@@ -26,4 +27,5 @@ hermes/static/pylons.css
 hermes/static/pyramid-small.png
 hermes/static/pyramid.png
 hermes/static/transparent.gif
-hermes/templates/mytemplate.pt
+hermes/views/__init__.py
+hermes/views/announce.py
