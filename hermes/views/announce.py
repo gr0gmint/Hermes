@@ -64,7 +64,7 @@ def announce(context, request):
     if 'event' in request.params:
         event = request.params['event']
         if event == 'started':
-
+            peer.active = True
             peer.uploaded = int(request.params['uploaded'])
             peer.downloaded = int(request.params['downloaded'])
             peer.uploaded_total += int(request.params['uploaded'])
@@ -94,6 +94,7 @@ def announce(context, request):
     if compactmode:
         peers = ""
         if peer.seeding:
+            log.error("peer is seeding")
             peer_objs = DBSession.query(Peer).filter_by(torrent=torrent).filter_by(active=True).filter_by(seeding=False).order_by(func.random()).limit(50).all()
         else:
             peer_objs = DBSession.query(Peer).filter_by(torrent=torrent).filter_by(active=True).filter_by(seeding=True).order_by(func.random()).limit(25).all()+DBSession.query(Peer).filter_by(torrent=torrent).filter_by(active=True).filter_by(seeding=False).order_by(func.random()).limit(25).all()
@@ -101,10 +102,9 @@ def announce(context, request):
         for i in peer_objs:
             if i == peer:
                 continue
-            if i.ip:    
-                ipsplit = i.ip.split(".")
-                peers += struct.pack(">BBBBH", int(ipsplit[0]), int(ipsplit[1]),  int(ipsplit[2]), int(ipsplit[3]), i.port)
-            log.error(toHex(peers))
+            ipsplit = i.ip.split(".")
+            peers += struct.pack(">BBBBH", int(ipsplit[0]), int(ipsplit[1]),  int(ipsplit[2]), int(ipsplit[3]), i.port)
+        log.error(toHex(peers))
         return Response(bencode({'interval': 1800, 'tracker id': 'Hermes', 'complete': torrent.seeders, 'incomplete': torrent.leechers, 'peers': peers}))
     if not 'no_peer_id' in request.params:
         peers = list()
@@ -119,3 +119,5 @@ def announce(context, request):
         log.error(peers)
         return Response(bencode({'interval': 1800, 'tracker id': 'Hermes', 'complete': torrent.seeders, 'incomplete': torrent.leechers, 'peers': peers}))
         
+    else:
+        log.error("NO_PEER_ID")
