@@ -102,6 +102,8 @@ def announce(context, request):
         for i in peer_objs:
             if i == peer:
                 continue
+            
+            log.error(i.ip)
             ipsplit = i.ip.split(".")
             peers += struct.pack(">BBBBH", int(ipsplit[0]), int(ipsplit[1]),  int(ipsplit[2]), int(ipsplit[3]), i.port)
         log.error(toHex(peers))
