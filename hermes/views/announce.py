@@ -109,6 +109,7 @@ def announce(context, request):
         log.error(toHex(peers))
         return Response(bencode({'interval': 1800, 'tracker id': 'Hermes', 'complete': torrent.seeders, 'incomplete': torrent.leechers, 'peers': peers}))
     if not 'no_peer_id' in request.params:
+        log.error("NOT COMPACT MODE")
         peers = list()
         if peer.seeding:
             peer_objs = DBSession.query(Peer).filter_by(active=True).filter_by(torrent=torrent).filter_by(seeding=False).order_by(func.random()).limit(50).all()
