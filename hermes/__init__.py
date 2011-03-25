@@ -38,6 +38,7 @@ def main(global_config, **settings):
     config.add_route('addtorrent', '/addtorrent')
     config.add_route('signup', '/signup')
     config.add_route('index', '/')
+    config.add_route('get_torrent', '/get_torrent/{id}')
     config.add_static_view('static', 'hermes:static')
     config.scan('hermes.views')
     config.scan('hermes.model')
