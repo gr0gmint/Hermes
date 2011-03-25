@@ -1,5 +1,4 @@
 from hermes.model import Base
-from dripple.model import Base, DBSession
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, DateTime, PickleType, Boolean, Index
 from sqlalchemy.orm import relationship, backref
 import datetime
