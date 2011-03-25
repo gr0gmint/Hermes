@@ -37,6 +37,7 @@ def main(global_config, **settings):
     config.add_route('announce', '/{passkey}/announce')
     config.add_route('addtorrent', '/addtorrent')
     config.add_route('signup', '/signup')
+    config.add_route('index', '/')
     config.add_static_view('static', 'hermes:static')
     config.scan('hermes.views')
     config.scan('hermes.model')
