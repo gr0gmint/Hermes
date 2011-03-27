@@ -6,7 +6,8 @@ from hermes.model import DBSession
 from sqlalchemy.sql.expression import func
 import random 
 import string
-
+from hermes.lib import get_principal
+import re
 import logging
 
 log = logging.getLogger(__name__)
@@ -18,8 +19,10 @@ class SignupForm(Form):
     
     def validate_username(form, field):
         log.error("validate_username")
+        if not re.match('[a-zA-Z0-9-_]+', field.data):
+            raise validators.ValidationError('Username may only contain alpha-numeric characters')
         if DBSession.query(User).filter(func.lower(User.username)==func.lower(field.data)).first():
-            raise validators.ValidationError('Username already taken!')
+            raise validators.ValidationError('Username already taken')
     
 @view_config(route_name='signup', renderer='/signup.mako')
 def signup(context, request):
@@ -28,6 +31,8 @@ def signup(context, request):
         if form.validate():
             u = User(form.username.data, form.password.data)
             u.passkey = "".join([random.choice(string.letters) for x in xrange(16)])
+            p = get_principal('group:user')
+            u.principals.append(p)
             log.error(form.username.data)
             DBSession.add(u)
             DBSession.commit()

@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from hermes.model import DBSession
 from hermes.model.db import User,Torrent,Peer
 from sqlalchemy.sql.expression import func
-
+import datetime
 from bencode import bencode
 
 import struct
@@ -27,6 +27,9 @@ def announce(context, request):
     infohash = toHex(request.params.multi['info_hash'])
     peer_id = toHex(request.params.multi['peer_id'])
     torrent = DBSession.query(Torrent).filter_by(info_hash=infohash).first()
+
+    if not torrent:
+        return failure("Torrent not found")
     peer = DBSession.query(Peer).filter_by(peer_id = peer_id).first()
     left = int(request.params['left'])
     if not peer:
@@ -40,8 +43,6 @@ def announce(context, request):
         peer.downloaded_total = 0
         peer.seeding = False
 
-    if not torrent:
-        return failure("Torrent not found")
         
     diff_uploaded = 0
     if 'uploaded' in request.params:
@@ -56,8 +57,6 @@ def announce(context, request):
     peer.port = int(request.params['port'])
     
     if left == 0:
-        if not peer.seeding:
-            torrent.seeders += 1
         peer.seeding = True
         DBSession.add(torrent)
         DBSession.commit()
@@ -78,7 +77,6 @@ def announce(context, request):
             peer.uploaded_total += diff_uploaded
             peer.downloaded_total += diff_downloaded
         elif event == 'completed':
-            DBSession.add(torrent)
             peer.seeding = True
             torrent.download_count += 1
             peer.active = True
@@ -91,6 +89,21 @@ def announce(context, request):
         peer.downloaded = int(request.params['downloaded'])
         peer.uploaded_total += diff_uploaded
         peer.downloaded_total += diff_downloaded
+    
+    if (datetime.datetime.now() - torrent.last_checked).seconds >= 60*10:
+        peer_objs = torrent.peers
+        seeders = 0
+        leechers = 0
+        for i in peer_objs:
+            if i.active:
+                if i.seeding:
+                    seeders += 1
+                else:
+                    leechers += 1
+        torrent.seeders = seeders
+        torrent.leechers = leechers
+        DBSession.add(torrent)
+    torrent.last_checked = datetime.datetime.now()
     DBSession.add(peer)
     DBSession.commit()
     if compactmode:

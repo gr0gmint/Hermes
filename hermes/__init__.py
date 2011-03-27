@@ -5,7 +5,9 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from hermes.model import initialize_sql
 from sqlalchemy import engine_from_config
+from pyramid.security import Everyone, Authenticated
 import logging 
+from hermes.resources import Protected
 
 log = logging.getLogger(__name__)
 
@@ -35,10 +37,14 @@ def main(global_config, **settings):
     config = Configurator(root_factory=Root, settings=settings, authorization_policy=authorization_policy, authentication_policy=authentication_policy)
     config.set_session_factory(session_factory_from_settings(settings))
     config.add_route('announce', '/{passkey}/announce')
-    config.add_route('addtorrent', '/addtorrent')
+    config.add_route('addtorrent', '/addtorrent', factory=Protected)
     config.add_route('signup', '/signup')
+    config.add_route('login', '/login')
     config.add_route('index', '/')
-    config.add_route('get_torrent', '/get_torrent/{id}')
+    config.add_route('browse', '/browse')
+    config.add_route('setup', '/setup')
+    config.add_route('get_torrent', '/get_torrent/{id}', factory=Protected)
+    config.add_route('logout', '/logout')
     config.add_static_view('static', 'hermes:static')
     config.scan('hermes.views')
     config.scan('hermes.model')

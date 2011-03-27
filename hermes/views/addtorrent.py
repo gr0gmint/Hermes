@@ -17,21 +17,25 @@ class AddTorrentForm(Form):
     def validate_torrent_file(form,field):
         if not getattr(field.data, 'filename', None):
             raise validators.ValidationError('You need to supply a torrentfile')
-@view_config(route_name='addtorrent', renderer='/addtorrent.mako')
+@view_config(route_name='addtorrent', renderer='/addtorrent.mako', permission='view')
 def addtorrent(context, request):
     if request.method=="POST":
         form = AddTorrentForm(request.params)
         if form.validate():
+            
             filename = save_torrent(form.torrent_file.data, request)
             abs_filename = os.path.join(request.registry.settings['torrent_dir'], filename)
             info = bencode.bencode(bencode.bdecode(open(abs_filename).read())['info'])
+            name = form.name.data
             info_hash = hashlib.sha1(info).hexdigest()
+            log.error('INFOHASH: '+info_hash)
             torrent = Torrent()
             torrent.info_hash = info_hash
-            torrent.name = form.name.data
+            torrent.name = unicode(name) 
             torrent.info = {}
             torrent.uploaded_time = datetime.datetime.now()
             torrent.torrent_file = filename
+            torrent.last_checked = datetime.datetime.now()
             DBSession.add(torrent)
             DBSession.commit()
             log.error(filename)

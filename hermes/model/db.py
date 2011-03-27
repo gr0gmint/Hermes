@@ -16,6 +16,7 @@ class Torrent(Base):
     download_count = Column(Integer, default=0)
     seeders = Column(Integer, default=0)
     leechers = Column(Integer, default=0)
+    last_checked = Column(DateTime)
 
 
 
