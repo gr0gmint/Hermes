@@ -90,7 +90,7 @@ def announce(context, request):
         peer.uploaded_total += diff_uploaded
         peer.downloaded_total += diff_downloaded
     
-    if (datetime.datetime.now() - torrent.last_checked).seconds >= 60*10:
+    if torrent.last_checked == None or (datetime.datetime.now() - torrent.last_checked).seconds >= 60*10:
         peer_objs = torrent.peers
         seeders = 0
         leechers = 0
