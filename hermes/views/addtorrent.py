@@ -9,6 +9,7 @@ import hashlib
 import datetime
 from hermes.model import DBSession
 from hermes.model.db import Torrent
+from hermes.lib import get_current_user
 log = logging.getLogger(__name__)
 
 class AddTorrentForm(Form):
@@ -19,6 +20,8 @@ class AddTorrentForm(Form):
             raise validators.ValidationError('You need to supply a torrentfile')
 @view_config(route_name='addtorrent', renderer='/addtorrent.mako', permission='view')
 def addtorrent(context, request):
+    u = get_current_user(request)
+    announce_url = ('http://%s/%s/announce' % (request.registry.settings['hostname'], u.passkey)).encode('utf-8')
     if request.method=="POST":
         form = AddTorrentForm(request.params)
         if form.validate():
@@ -38,7 +41,7 @@ def addtorrent(context, request):
             DBSession.add(torrent)
             DBSession.commit()
             log.error(filename)
-        return {'form': form}
+        return {'form': form, 'announce': announce_url}
     else:
         form = AddTorrentForm()
-        return {'form': form}
+        return {'form': form, 'announce': announce_url}
