@@ -1,11 +1,23 @@
+<!DOCTYPE html>
 <%!
     from hermes.model import DBSession
     from hermes.model.db import User
+    notation = ['KB', 'MB', 'GB', 'TB']
 %>
-<!DOCTYPE html>
 <%
 if 'username' in request.session:
     user = DBSession.query(User).filter_by(username=request.session['username']).first()
+    upload_notation = 'B'
+    uploaded = user.uploaded
+    download_notation = 'B'
+    downloaded = user.downloaded
+    for i in range(0, len(notation)):
+        if user.uploaded > 10**(3+i*3):
+            upload_notation = notation[i]
+            uploaded = user.uploaded / float(10**(3+i*3))
+        if user.downloaded > 10**(3+i*3):
+            download_notation = notation[i]
+            downloaded = user.downloaded / float(10**(3+i*3))
 else:
     user = None
 %>
@@ -23,7 +35,7 @@ Hermes
 <div id="topbar">
 %if user:
 
-<span>Uploaded: ${user.uploaded} </span><span>Downloaded: ${user.downloaded} </span>
+<span>Uploaded: ${uploaded} ${upload_notation} </span><span>Downloaded: ${downloaded} ${download_notation} </span>
 %if user.downloaded != 0:
     <span>Ratio: ${float(user.uploaded)/user.downloaded}</span>
 %else:
