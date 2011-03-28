@@ -102,8 +102,9 @@ def announce(context, request):
                     leechers += 1
         torrent.seeders = seeders
         torrent.leechers = leechers
+        torrent.last_checked = datetime.datetime.now()
         DBSession.add(torrent)
-    torrent.last_checked = datetime.datetime.now()
+    
     DBSession.add(peer)
     DBSession.commit()
     if compactmode:
