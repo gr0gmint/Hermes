@@ -1,4 +1,14 @@
+<%!
+    from hermes.model import DBSession
+    from hermes.model.db import User
+%>
 <!DOCTYPE html>
+<%
+if 'username' in request.session:
+    user = DBSession.query(User).filter_by(username=request.session['username']).first()
+else:
+    user = None
+%>
 <html>
 <head>
 <title>
@@ -10,6 +20,17 @@ Hermes
 <meta name="author" content="author"/> 
 </head>
 <body>
+<div id="topbar">
+%if user:
+
+<span>Uploaded: ${user.uploaded} </span><span>Downloaded: ${user.downloaded} </span>
+%if user.downloaded != 0:
+    <span>Ratio: ${float(user.uploaded)/user.downloaded}</span>
+%else:
+    <span>Ratio: infinite</span>
+%endif
+%endif
+</div>
 <div id="flashmessage">
 %if 'flashmessage' in request.session:
     ${request.session['flashmessage']}

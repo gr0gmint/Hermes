@@ -70,12 +70,16 @@ def announce(context, request):
             peer.downloaded = int(request.params['downloaded'])
             peer.uploaded_total += int(request.params['uploaded'])
             peer.downloaded_total += int(request.params['downloaded'])
+            user.uploaded += int(request.params['uploaded'])
+            user.downloaded += int(request.params['downloaded'])
         elif event == 'stopped':
             peer.active = False
             peer.uploaded = 0
             peer.downloaded = 0
             peer.uploaded_total += diff_uploaded
             peer.downloaded_total += diff_downloaded
+            user.uploaded += diff_uploaded
+            user.downloaded += diff_downloaded
         elif event == 'completed':
             peer.seeding = True
             torrent.download_count += 1
@@ -84,11 +88,15 @@ def announce(context, request):
             peer.downloaded = int(request.params['downloaded'])
             peer.uploaded_total += diff_uploaded
             peer.downloaded_total += diff_downloaded
+            user.uploaded += diff_uploaded
+            user.downloaded += diff_downloaded
     else:
         peer.uploaded = int(request.params['uploaded'])
         peer.downloaded = int(request.params['downloaded'])
         peer.uploaded_total += diff_uploaded
         peer.downloaded_total += diff_downloaded
+        user.uploaded += diff_uploaded
+        user.downloaded += diff_downloaded
     
     if torrent.last_checked == None or (datetime.datetime.now() - torrent.last_checked).seconds >= 60*10:
         peer_objs = torrent.peers
