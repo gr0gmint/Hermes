@@ -38,6 +38,7 @@ def addtorrent(context, request):
             torrent.info = {}
             torrent.uploaded_time = datetime.datetime.now()
             torrent.torrent_file = filename
+            torrent.last_checked = datetime.datetime.now()
             DBSession.add(torrent)
             DBSession.commit()
             log.error(filename)
