@@ -17,8 +17,15 @@ class Torrent(Base):
     seeders = Column(Integer, default=0)
     leechers = Column(Integer, default=0)
     last_checked = Column(DateTime)
+    
+    category_id = Column(Integer, ForeignKey('categories.id'))
+    category = relationship('Category', backref='torrents')
 
-
+class Category(Base):
+    __tablename__ = 'categories'
+    id = Column(Integer, primary_key=True)
+    image = Column(String)
+    name = Column(String)
 
 class PrincipalMembers(Base):
     __tablename__ = 'principalmembers'
