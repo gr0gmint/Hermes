@@ -35,7 +35,7 @@ Hermes
 <div id="topbar">
 %if user:
 
-<span>Uploaded: ${uploaded} ${upload_notation} </span><span>Downloaded: ${downloaded} ${download_notation} </span>
+<span>Uploaded: ${"%.2f" % uploaded} ${upload_notation} </span><span>Downloaded: ${"%.2f" % downloaded} ${download_notation} </span>
 %if user.downloaded != 0:
     <span>Ratio: ${"%.2f" % (float(user.uploaded)/user.downloaded)}</span>
 %else:
