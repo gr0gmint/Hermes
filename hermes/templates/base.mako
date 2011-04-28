@@ -37,7 +37,7 @@ Hermes
 
 <span>Uploaded: ${uploaded} ${upload_notation} </span><span>Downloaded: ${downloaded} ${download_notation} </span>
 %if user.downloaded != 0:
-    <span>Ratio: ${"%.2f" % float(user.uploaded)/user.downloaded}</span>
+    <span>Ratio: ${"%.2f" % (float(user.uploaded)/user.downloaded)}</span>
 %else:
     <span>Ratio: infinite</span>
 %endif
