@@ -1,2 +1,6 @@
 pyramid
 WebError
+pyramid_beaker
+bencode
+sqlalchemy
+wtforms
